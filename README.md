@@ -1,0 +1,2 @@
+# vaccine-yotei
+ChatGPTを使いFileMakerをデータベースにして100円予定表作成プログラムを作る。
