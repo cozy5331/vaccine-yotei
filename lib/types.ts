@@ -32,20 +32,16 @@ export type FormValues = {
   niti: VaccineEntry;
 };
 
-export const vaccineTypeOptions = [
-  "なし",
-  "ロタリックス",
-  "ロタテック",
-  "ヒブ",
-  "肺炎球菌",
-  "四種混合",
-  "五種混合",
-  "B型肝炎",
-  "MR",
-  "水痘",
-  "ムンプス",
-  "日本脳炎",
-] as const;
+export const rotaTypeOptions = ["なし", "ロタリックス", "ロタテック"] as const;
+export const hibTypeOptions = ["なし", "ヒブ"] as const;
+export const haiTypeOptions = ["なし", "肺炎球菌"] as const;
+export const yonTypeOptions = ["なし", "四種混合"] as const;
+export const goTypeOptions = ["なし", "五種混合"] as const;
+export const hbTypeOptions = ["なし", "B型肝炎"] as const;
+export const mrTypeOptions = ["なし", "MR"] as const;
+export const suiTypeOptions = ["なし", "水痘"] as const;
+export const mumpusTypeOptions = ["なし", "ムンプス"] as const;
+export const nitiTypeOptions = ["なし", "日本脳炎"] as const;
 
 export const countOptions = [
   "未接種",
