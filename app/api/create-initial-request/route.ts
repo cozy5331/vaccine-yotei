@@ -1,4 +1,4 @@
-import { callFileMakerScript } from "@/lib/filemaker";
+import { runFileMakerScript } from "@/lib/filemaker";
 
 export async function POST(req: Request) {
   try {
@@ -14,13 +14,12 @@ export async function POST(req: Request) {
       );
     }
 
-    const fm = await callFileMakerScript("API_受付作成", body);
+    const fm = await runFileMakerScript("API_受付作成", body);
 
     return Response.json(
       {
         status: "ok",
-        request_id: fm.request_id,
-        payment_status: fm.payment_status,
+        raw: fm,
       },
       { status: 200 }
     );
