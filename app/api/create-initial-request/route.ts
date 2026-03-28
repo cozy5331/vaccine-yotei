@@ -14,7 +14,7 @@ export async function POST(req: Request) {
       );
     }
 
-    const fm = await runFileMakerScript("API_受付作成", body);
+    const fm = await runFileMakerScript("Web受付_API_受付作成", body);
 
     return Response.json(
       {

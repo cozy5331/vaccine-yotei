@@ -1,76 +1,52 @@
 import {
-  AuthenticationDetails,
   CognitoUser,
   CognitoUserPool,
+  CognitoRefreshToken,
 } from "amazon-cognito-identity-js";
 
-type ClarisEndpointResponse = {
-  errcode: string;
-  data: {
-    UserPool_ID: string;
-    Client_ID: string;
-  };
-};
+async function getClarisIdTokenFromRefreshToken(): Promise<string> {
+  const userPoolId = process.env.CLARIS_USER_POOL_ID;
+  const clientId = process.env.CLARIS_CLIENT_ID;
+  const refreshTokenValue = process.env.CLARIS_ID_REFRESH_TOKEN;
 
-async function getClarisPoolInfo() {
-  const res = await fetch(
-    "https://www.ifmcloud.com/endpoint/userpool/2.2.0.my.claris.com.json",
-    { cache: "no-store" }
-  );
-
-  if (!res.ok) {
-    throw new Error(`Failed to fetch Claris pool info: ${res.status}`);
+  if (!userPoolId || !clientId || !refreshTokenValue) {
+    throw new Error(
+      "CLARIS_USER_POOL_ID / CLARIS_CLIENT_ID / CLARIS_ID_REFRESH_TOKEN が未設定です"
+    );
   }
 
-  const json = (await res.json()) as ClarisEndpointResponse;
+  const userPool = new CognitoUserPool({
+    UserPoolId: userPoolId,
+    ClientId: clientId,
+  });
 
-  if (json.errcode !== "Ok") {
-    throw new Error("Failed to load Claris authentication settings");
+  // Username は refreshSession のために必要
+  // ここでは固定値ではなく subject として扱えるよう、任意の識別子ではなく
+  // 実際には取得時に使った Claris ID メールアドレスを入れるのが安全です
+  const username = process.env.CLARIS_ID_USERNAME_FOR_REFRESH;
+
+  if (!username) {
+    throw new Error("CLARIS_ID_USERNAME_FOR_REFRESH が未設定です");
   }
 
-  return {
-    userPoolId: json.data.UserPool_ID,
-    clientId: json.data.Client_ID,
-  };
-}
+  const cognitoUser = new CognitoUser({
+    Username: username,
+    Pool: userPool,
+  });
 
-async function getClarisIdToken(): Promise<string> {
-  const username = process.env.CLARIS_ID_USERNAME;
-  const password = process.env.CLARIS_ID_PASSWORD;
-
-  if (!username || !password) {
-    throw new Error("CLARIS_ID_USERNAME または CLARIS_ID_PASSWORD が未設定です");
-  }
-
-  const { userPoolId, clientId } = await getClarisPoolInfo();
+  const refreshToken = new CognitoRefreshToken({
+    RefreshToken: refreshTokenValue,
+  });
 
   return await new Promise<string>((resolve, reject) => {
-    const authenticationDetails = new AuthenticationDetails({
-      Username: username,
-      Password: password,
-    });
-
-    const userPool = new CognitoUserPool({
-      UserPoolId: userPoolId,
-      ClientId: clientId,
-    });
-
-    const cognitoUser = new CognitoUser({
-      Username: username,
-      Pool: userPool,
-    });
-
-    cognitoUser.authenticateUser(authenticationDetails, {
-      onSuccess: (result) => {
-        const clarisIdToken = result.getIdToken().getJwtToken();
-        resolve(clarisIdToken);
-      },
-      onFailure: (err) => {
+    cognitoUser.refreshSession(refreshToken, (err, session) => {
+      if (err) {
         reject(err);
-      },
-      mfaRequired: () => {
-        reject(new Error("MFA が有効な Claris ID はサーバー側自動処理に不向きです"));
-      },
+        return;
+      }
+
+      const idToken = session.getIdToken().getJwtToken();
+      resolve(idToken);
     });
   });
 }
@@ -80,10 +56,10 @@ async function getDataApiSessionToken(): Promise<string> {
   const database = process.env.FILEMAKER_DATABASE;
 
   if (!host || !database) {
-    throw new Error("FILEMAKER_HOST または FILEMAKER_DATABASE が未設定です");
+    throw new Error("FILEMAKER_HOST / FILEMAKER_DATABASE が未設定です");
   }
 
-  const clarisIdToken = await getClarisIdToken();
+  const clarisIdToken = await getClarisIdTokenFromRefreshToken();
 
   const res = await fetch(
     `https://${host}/fmi/data/vLatest/databases/${encodeURIComponent(database)}/sessions`,
@@ -98,15 +74,18 @@ async function getDataApiSessionToken(): Promise<string> {
     }
   );
 
+  const body = await res.json().catch(() => null);
+
   if (!res.ok) {
-    throw new Error(`Failed to create Data API session: ${res.status}`);
+    throw new Error(
+      body?.messages?.[0]?.message || `Failed to create Data API session: ${res.status}`
+    );
   }
 
   const sessionToken = res.headers.get("x-fm-data-access-token");
-  const body = await res.json();
 
-  if (!sessionToken || body?.messages?.[0]?.code !== "0") {
-    throw new Error(body?.messages?.[0]?.message || "Data API session creation failed");
+  if (!sessionToken) {
+    throw new Error("X-FM-Data-Access-Token が取得できません");
   }
 
   return sessionToken;
@@ -132,16 +111,20 @@ export async function runFileMakerScript(scriptName: string, parameter: unknown)
   const res = await fetch(url, {
     method: "GET",
     headers: {
-      "Content-Type": "application/json",
       Authorization: `Bearer ${sessionToken}`,
+      "Content-Type": "application/json",
     },
     cache: "no-store",
   });
 
-  const data = await res.json();
+  const data = await res.json().catch(() => null);
 
-  if (!res.ok || data?.messages?.[0]?.code !== "0") {
+  if (!res.ok) {
     throw new Error(data?.messages?.[0]?.message || `Script run failed: ${res.status}`);
+  }
+
+  if (data?.messages?.[0]?.code && data.messages[0].code !== "0") {
+    throw new Error(data?.messages?.[0]?.message || "FileMaker script error");
   }
 
   return data;
