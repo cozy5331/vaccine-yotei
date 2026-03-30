@@ -155,21 +155,13 @@ export default async function ResultPage({ searchParams }: ResultPageProps) {
         )}
 
         <section className="flex flex-wrap gap-3 print:hidden">
-          <button
-            type="button"
-            onClick={() => window.print()}
-            className="rounded-2xl border bg-white px-5 py-3 font-semibold shadow-sm"
-          >
-            PDFとして保存 / 印刷
-          </button>
-
-          <a
-            href="/form"
-            className="rounded-2xl border bg-white px-5 py-3 font-semibold shadow-sm"
-          >
-            新しく作成する
-          </a>
-        </section>
+  <a
+    href="/form"
+    className="rounded-2xl border bg-white px-5 py-3 font-semibold shadow-sm"
+  >
+    新しく作成する
+  </a>
+</section>
       </div>
     </main>
   );
