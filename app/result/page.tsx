@@ -1,3 +1,5 @@
+import PrintButton from "@/components/PrintButton";
+
 type ResultPageProps = {
   searchParams: Promise<{ request_id?: string }>;
 };
@@ -154,7 +156,9 @@ export default async function ResultPage({ searchParams }: ResultPageProps) {
           </ResultSection>
         )}
 
-        <section className="flex flex-wrap gap-3 print:hidden">
+<section className="flex flex-wrap gap-3 print:hidden">
+  <PrintButton />
+
   <a
     href="/form"
     className="rounded-2xl border bg-white px-5 py-3 font-semibold shadow-sm"
