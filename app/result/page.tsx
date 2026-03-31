@@ -1,5 +1,5 @@
-import ResumeQrBlock from "@/components/ResumeQrBlock";
 import PrintButton from "@/components/PrintButton";
+import ResumeQrBlock from "@/components/ResumeQrBlock";
 
 type ResultPageProps = {
   searchParams: Promise<{ request_id?: string }>;
@@ -52,8 +52,15 @@ export default async function ResultPage({ searchParams }: ResultPageProps) {
         <div className="mx-auto max-w-4xl space-y-6">
           <h1 className="text-2xl font-bold">予防接種予定表</h1>
           <div className="rounded-2xl border border-red-300 bg-red-50 p-5 text-red-700">
-            request_id がありません。
+            request_id がありません。<br />
+            Stripe 決済後に戻ってきたURLに request_id が付いていない可能性があります。
           </div>
+          <a
+            href="/form"
+            className="inline-block rounded-2xl border bg-white px-5 py-3 font-semibold shadow-sm"
+          >
+            入力画面へ戻る
+          </a>
         </div>
       </main>
     );
@@ -86,6 +93,14 @@ export default async function ResultPage({ searchParams }: ResultPageProps) {
     data?.result?.validation_status ??
     "";
 
+  const paymentStatus =
+    data?.result?.payment_status ??
+    "";
+
+  const createdAt =
+    data?.result?.created_at ??
+    "";
+
   return (
     <main className="min-h-screen bg-gray-50 p-6 print:bg-white print:p-0">
       <div className="mx-auto max-w-4xl space-y-6 print:max-w-none print:space-y-4">
@@ -97,10 +112,20 @@ export default async function ResultPage({ searchParams }: ResultPageProps) {
         </header>
 
         <ResultSection title="受付情報">
-          <div className="grid gap-4 text-sm md:grid-cols-3">
+          <div className="grid gap-4 text-sm md:grid-cols-2">
             <div>
               <div className="text-gray-500">request_id</div>
               <div className="break-all font-medium">{requestId}</div>
+            </div>
+
+            <div>
+              <div className="text-gray-500">作成日時</div>
+              <div className="font-medium">{createdAt || "未取得"}</div>
+            </div>
+
+            <div>
+              <div className="text-gray-500">支払状態</div>
+              <div className="font-medium">{paymentStatus || "未取得"}</div>
             </div>
 
             <div>
@@ -146,23 +171,23 @@ export default async function ResultPage({ searchParams }: ResultPageProps) {
 
         {displayToken && <ResumeQrBlock token={displayToken} />}
 
-<section className="flex flex-wrap gap-3 print:hidden">
-  <PrintButton />
+        <section className="flex flex-wrap gap-3 print:hidden">
+          <PrintButton />
 
-  <a
-    href="/form"
-    className="rounded-2xl border bg-white px-5 py-3 font-semibold shadow-sm"
-  >
-    新しく作成する
-  </a>
+          <a
+            href="/form"
+            className="rounded-2xl border bg-white px-5 py-3 font-semibold shadow-sm"
+          >
+            新しく作成する
+          </a>
 
-  <a
-    href="/resume"
-    className="rounded-2xl border bg-white px-5 py-3 font-semibold shadow-sm"
-  >
-    前回内容を引き継いで更新
-  </a>
-</section>
+          <a
+            href="/resume"
+            className="rounded-2xl border bg-white px-5 py-3 font-semibold shadow-sm"
+          >
+            前回内容を引き継いで更新
+          </a>
+        </section>
       </div>
     </main>
   );
