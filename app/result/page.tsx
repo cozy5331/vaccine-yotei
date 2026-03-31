@@ -1,3 +1,4 @@
+import ResumeQrBlock from "@/components/ResumeQrBlock";
 import PrintButton from "@/components/PrintButton";
 
 type ResultPageProps = {
@@ -143,18 +144,7 @@ export default async function ResultPage({ searchParams }: ResultPageProps) {
           )}
         </ResultSection>
 
-        {displayToken && (
-          <ResultSection title="次回用番号">
-            <div className="space-y-2">
-              <div className="text-sm text-gray-600">
-                次回、前回内容を引き継いで更新する時に使います。
-              </div>
-              <div className="break-all rounded-xl bg-gray-100 px-4 py-3 text-base font-semibold tracking-wide">
-                {displayToken}
-              </div>
-            </div>
-          </ResultSection>
-        )}
+        {displayToken && <ResumeQrBlock token={displayToken} />}
 
 <section className="flex flex-wrap gap-3 print:hidden">
   <PrintButton />
