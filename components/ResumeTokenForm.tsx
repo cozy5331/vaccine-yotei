@@ -60,7 +60,7 @@ export default function ResumeTokenForm() {
       <div className="space-y-2">
         <h1 className="text-2xl font-bold">前回内容を引き継いで更新</h1>
         <p className="text-sm text-gray-600">
-          前回用番号を入力すると、前回の接種内容をもとに更新できます。
+          結果ページに表示された次回用番号を入力すると、前回の内容を引き継いで更新できます。
         </p>
       </div>
 
@@ -71,7 +71,7 @@ export default function ResumeTokenForm() {
             type="text"
             value={token}
             onChange={(e) => setToken(e.target.value)}
-            placeholder="例: 000000-63910277169913"
+            placeholder="例: 95C1_869B_37C8"
             className="w-full rounded-lg border px-3 py-2"
           />
         </label>
@@ -90,6 +90,15 @@ export default function ResumeTokenForm() {
       >
         {loading ? "読込中..." : "前回内容を読み込む"}
       </button>
+
+      <div className="pt-2">
+        <a
+          href="/form"
+          className="inline-block rounded-2xl border bg-white px-6 py-3 font-semibold shadow-sm"
+        >
+          新しく作成する
+        </a>
+      </div>
     </form>
   );
 }

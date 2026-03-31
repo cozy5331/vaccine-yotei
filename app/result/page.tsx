@@ -165,6 +165,13 @@ export default async function ResultPage({ searchParams }: ResultPageProps) {
   >
     新しく作成する
   </a>
+
+  <a
+    href="/resume"
+    className="rounded-2xl border bg-white px-5 py-3 font-semibold shadow-sm"
+  >
+    前回内容を引き継いで更新
+  </a>
 </section>
       </div>
     </main>
