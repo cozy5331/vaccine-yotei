@@ -16,7 +16,7 @@ export async function GET(req: Request) {
     }
 
     const fm = await runFileMakerScript("Web受付_API_前回データ取得", {
-      result_url_token: token,
+      input_token: token,
     });
 
     let scriptResult: any = {};
