@@ -20,7 +20,7 @@ export default async function ResumeQrBlock({ token }: ResumeQrBlockProps) {
 
       <div className="mt-3 space-y-3">
         <div className="text-sm text-gray-600">
-          次回、前回内容を引き継いで更新する時に使います。
+          諸事情で予定が変更になった場合は、次回この番号を使って前回内容を引き継いで更新できます。
         </div>
 
         <div className="break-all rounded-xl bg-gray-100 px-4 py-3 text-base font-semibold tracking-wide">
