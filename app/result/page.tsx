@@ -1,10 +1,11 @@
+import PrintButton from "@/components/PrintButton";
 import ResumeQrBlock from "@/components/ResumeQrBlock";
 
-type SearchParams = Promise<{
-  request_id?: string;
-}>;
+type ResultPageProps = {
+  searchParams: Promise<{ request_id?: string }>;
+};
 
-async function getResult(requestId: string) {
+async function fetchResult(requestId: string) {
   const baseUrl =
     process.env.APP_BASE_URL || "https://vaccine-yotei.vercel.app";
 
@@ -13,149 +14,181 @@ async function getResult(requestId: string) {
     { cache: "no-store" }
   );
 
-  return res.json();
+  const text = await res.text();
+
+  try {
+    return JSON.parse(text);
+  } catch {
+    return {
+      status: "error",
+      message: "結果APIの応答がJSONではありません",
+      raw: text,
+    };
+  }
 }
 
-export default async function ResultPage({
-  searchParams,
+function ResultSection({
+  title,
+  children,
 }: {
-  searchParams: SearchParams;
+  title: string;
+  children: React.ReactNode;
 }) {
+  return (
+    <section className="rounded-2xl border bg-white p-5 shadow-sm">
+      <h2 className="text-lg font-semibold">{title}</h2>
+      <div className="mt-3">{children}</div>
+    </section>
+  );
+}
+
+export default async function ResultPage({ searchParams }: ResultPageProps) {
   const params = await searchParams;
-  const requestId = params?.request_id ?? "";
+  const requestId = params.request_id ?? "";
 
   if (!requestId) {
     return (
-      <main className="mx-auto max-w-4xl p-6 space-y-6">
-        <section className="rounded-2xl border bg-white p-5 shadow-sm">
+      <main className="min-h-screen bg-gray-50 p-6">
+        <div className="mx-auto max-w-4xl space-y-6">
           <h1 className="text-2xl font-bold">予防接種予定表</h1>
-          <p className="mt-3 text-sm text-red-600">request_id がありません。</p>
-        </section>
+          <div className="rounded-2xl border border-red-300 bg-red-50 p-5 text-red-700">
+            request_id がありません。<br />
+            Stripe 決済後に戻ってきたURLに request_id が付いていない可能性があります。
+          </div>
+          <a
+            href="/form"
+            className="inline-block rounded-2xl border bg-white px-5 py-3 font-semibold shadow-sm"
+          >
+            入力画面へ戻る
+          </a>
+        </div>
       </main>
     );
   }
 
-  const data = await getResult(requestId);
+  const data = await fetchResult(requestId);
 
-  const paymentStatus = data?.result?.payment_status ?? "";
-  const resultStatus = data?.result?.result_status ?? "";
-  const validationStatus = data?.result?.validation_status ?? "";
-  const validationErrors = data?.result?.validation_errors ?? "";
-  const createdAt = data?.result?.created_at ?? "";
-  const displayToken = data?.result?.display_token ?? "";
-  const resultHtml = data?.result?.result_html ?? "";
-  const resultText = data?.result?.result_text ?? "";
-  const errorMessage = data?.result?.error_message ?? "";
+  const resultHtml =
+    data?.result?.result_html ??
+    data?.result?.html ??
+    data?.result?.resultHtml ??
+    "";
+
+  const resultText =
+    data?.result?.result_text ??
+    data?.result?.text ??
+    "";
+
+  const displayToken =
+    data?.result?.display_token ??
+    data?.result?.result_url_token ??
+    "";
+
+  const resultStatus =
+    data?.result?.result_status ??
+    data?.judge?.result_status ??
+    "";
+
+  const validationStatus =
+    data?.result?.validation_status ??
+    "";
+
+  const paymentStatus =
+    data?.result?.payment_status ??
+    "";
+
+  const createdAt =
+    data?.result?.created_at ??
+    "";
 
   return (
-    <main className="mx-auto max-w-4xl p-6 space-y-6">
-      <section className="rounded-2xl border bg-white p-5 shadow-sm">
-        <h1 className="text-2xl font-bold">予防接種予定表</h1>
-        <p className="mt-2 text-sm text-gray-600">
-          生成結果の確認ページです。必要に応じてブラウザの印刷機能で PDF
-          保存してください。
-        </p>
-      </section>
-
-      <section className="rounded-2xl border bg-white p-5 shadow-sm">
-        <h2 className="text-lg font-semibold">受付情報</h2>
-
-        <div className="mt-3 grid gap-3 md:grid-cols-2">
-          <div>
-            <div className="text-sm text-gray-500">request_id</div>
-            <div className="font-medium break-all">{requestId}</div>
-          </div>
-
-          <div>
-            <div className="text-sm text-gray-500">作成日時</div>
-            <div className="font-medium">{createdAt || "未取得"}</div>
-          </div>
-
-          <div>
-            <div className="text-sm text-gray-500">支払状態</div>
-            <div className="font-medium">{paymentStatus || "未取得"}</div>
-          </div>
-
-          <div>
-            <div className="text-sm text-gray-500">判定状態</div>
-            <div className="font-medium">{resultStatus || "未取得"}</div>
-          </div>
-
-          <div>
-            <div className="text-sm text-gray-500">妥当性チェック</div>
-            <div className="font-medium">{validationStatus || "未取得"}</div>
-          </div>
-        </div>
-
-        <div className="mt-4 rounded-xl bg-gray-50 px-4 py-3">
-          <p className="text-xs leading-5 text-gray-500">
-            ※ 判定状態と妥当性チェックは内部確認用の表示です。予定表が表示されていれば、その内容を接種計画の目安としてご利用いただけます。内部処理の反映タイミングや機械的な確認条件により、「処理中」や「NG」と表示されることがあります。日程調整が大きい場合は、近々の予防接種後にもう一度予定表を作成してください。
+    <main className="min-h-screen bg-gray-50 p-6 print:bg-white print:p-0">
+      <div className="mx-auto max-w-4xl space-y-6 print:max-w-none print:space-y-4">
+        <header className="space-y-2 print:space-y-1">
+          <h1 className="text-2xl font-bold print:text-xl">予防接種予定表</h1>
+          <p className="text-sm text-gray-600 print:text-xs">
+            生成結果の確認ページです。必要に応じてブラウザの印刷機能で PDF 保存してください。
           </p>
-        </div>
-      </section>
+        </header>
 
-      {errorMessage && (
-        <section className="rounded-2xl border border-amber-300 bg-amber-50 p-5 shadow-sm">
-          <h2 className="text-lg font-semibold text-amber-800">補足情報</h2>
-          <p className="mt-2 text-sm text-amber-800">{errorMessage}</p>
-        </section>
-      )}
+        <ResultSection title="受付情報">
+          <div className="grid gap-4 text-sm md:grid-cols-2">
+            <div>
+              <div className="text-gray-500">request_id</div>
+              <div className="break-all font-medium">{requestId}</div>
+            </div>
 
-      {validationErrors && (
-        <section className="rounded-2xl border border-yellow-300 bg-yellow-50 p-5 shadow-sm">
-          <h2 className="text-lg font-semibold text-yellow-800">
-            妥当性チェック詳細
-          </h2>
-          <pre className="mt-2 whitespace-pre-wrap text-sm text-yellow-800">
-            {validationErrors}
-          </pre>
-        </section>
-      )}
+            <div>
+              <div className="text-gray-500">作成日時</div>
+              <div className="font-medium">{createdAt || "未取得"}</div>
+            </div>
 
-      <section className="rounded-2xl border bg-white p-5 shadow-sm">
-        <h2 className="text-lg font-semibold">予定表</h2>
+            <div>
+              <div className="text-gray-500">支払状態</div>
+              <div className="font-medium">{paymentStatus || "未取得"}</div>
+            </div>
 
-        {resultHtml ? (
-          <div
-            className="prose prose-sm mt-4 max-w-none"
-            dangerouslySetInnerHTML={{ __html: resultHtml }}
-          />
-        ) : resultText ? (
-          <pre className="mt-4 whitespace-pre-wrap text-sm leading-7">
-            {resultText}
-          </pre>
-        ) : (
-          <p className="mt-4 text-sm text-gray-600">まだ結果がありません。</p>
+            <div>
+              <div className="text-gray-500">判定状態</div>
+              <div className="font-medium">{resultStatus || "未取得"}</div>
+            </div>
+
+            <div>
+              <div className="text-gray-500">妥当性チェック</div>
+              <div className="font-medium">{validationStatus || "未取得"}</div>
+            </div>
+          </div>
+        </ResultSection>
+
+        {data?.status !== "ok" && (
+          <section className="rounded-2xl border border-red-300 bg-red-50 p-5 text-red-700">
+            <h2 className="text-lg font-semibold">エラー</h2>
+            <div className="mt-3 whitespace-pre-wrap text-sm">
+              {data?.message || "結果取得に失敗しました。"}
+            </div>
+            {data?.raw && (
+              <pre className="mt-3 overflow-x-auto rounded-xl bg-white p-3 text-xs text-gray-700">
+                {typeof data.raw === "string"
+                  ? data.raw
+                  : JSON.stringify(data.raw, null, 2)}
+              </pre>
+            )}
+          </section>
         )}
-      </section>
 
-      {displayToken && <ResumeQrBlock token={displayToken} />}
+        <ResultSection title="予定表">
+          {resultHtml ? (
+            <div
+              className="prose max-w-none prose-headings:mt-4 prose-headings:mb-2 prose-p:my-2 prose-li:my-1"
+              dangerouslySetInnerHTML={{ __html: resultHtml }}
+            />
+          ) : (
+            <div className="whitespace-pre-wrap text-sm leading-6">
+              {resultText || "まだ結果がありません。"}
+            </div>
+          )}
+        </ResultSection>
 
-      <section className="flex flex-wrap gap-3">
-        <button
-          type="button"
-          onClick={() => window.print()}
-          className="rounded-2xl border bg-white px-5 py-3 text-sm font-semibold shadow-sm"
-        >
-          PDFとして保存 / 印刷
-        </button>
+        {displayToken && <ResumeQrBlock token={displayToken} />}
 
-        <a
-          href="/form"
-          className="rounded-2xl border bg-white px-5 py-3 text-sm font-semibold shadow-sm"
-        >
-          新しく作成する
-        </a>
+        <section className="flex flex-wrap gap-3 print:hidden">
+          <PrintButton />
 
-        {displayToken && (
           <a
-            href={`/resume?token=${encodeURIComponent(displayToken)}`}
-            className="rounded-2xl border bg-white px-5 py-3 text-sm font-semibold shadow-sm"
+            href="/form"
+            className="rounded-2xl border bg-white px-5 py-3 font-semibold shadow-sm"
+          >
+            新しく作成する
+          </a>
+
+          <a
+            href="/resume"
+            className="rounded-2xl border bg-white px-5 py-3 font-semibold shadow-sm"
           >
             前回内容を引き継いで更新
           </a>
-        )}
-      </section>
+        </section>
+      </div>
     </main>
   );
 }
