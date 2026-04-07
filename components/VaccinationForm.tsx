@@ -206,7 +206,7 @@ export default function VaccinationForm({
       </div>
 
       <VaccineRow
-        label="ロタ"
+        label="ロタ_最後に接種したもののみ記入"
         typeValue={form.rota.type}
         countValue={form.rota.count}
         dateValue={form.rota.date}
@@ -218,7 +218,7 @@ export default function VaccinationForm({
       />
 
       <VaccineRow
-        label="ヒブ"
+        label="ヒブ_最後に接種したもののみ記入"
         typeValue={form.hib.type}
         countValue={form.hib.count}
         dateValue={form.hib.date}
@@ -230,7 +230,7 @@ export default function VaccinationForm({
       />
 
       <VaccineRow
-        label="肺炎球菌"
+        label="肺炎球菌_最後に接種したもののみ記入"
         typeValue={form.hai.type}
         countValue={form.hai.count}
         dateValue={form.hai.date}
@@ -247,7 +247,7 @@ export default function VaccinationForm({
       />
 
       <VaccineRow
-        label="四種混合"
+        label="四種混合_最後に接種したもののみ記入"
         typeValue={form.yon.type}
         countValue={form.yon.count}
         dateValue={form.yon.date}
@@ -259,7 +259,7 @@ export default function VaccinationForm({
       />
 
       <VaccineRow
-        label="五種混合"
+        label="五種混合_最後に接種したもののみ記入"
         typeValue={form.go.type}
         countValue={form.go.count}
         dateValue={form.go.date}
@@ -326,7 +326,7 @@ export default function VaccinationForm({
       </div>
 
       <VaccineRow
-        label="MR"
+        label="MR_最後に接種したもののみ記入"
         typeValue={form.mr.type}
         countValue={form.mr.count}
         dateValue={form.mr.date}
@@ -338,7 +338,7 @@ export default function VaccinationForm({
       />
 
       <VaccineRow
-        label="水痘"
+        label="水痘_最後に接種したもののみ記入"
         typeValue={form.sui.type}
         countValue={form.sui.count}
         dateValue={form.sui.date}
@@ -350,7 +350,7 @@ export default function VaccinationForm({
       />
 
       <VaccineRow
-        label="ムンプス"
+        label="ムンプス_最後に接種したもののみ記入"
         typeValue={form.mumpus.type}
         countValue={form.mumpus.count}
         dateValue={form.mumpus.date}
@@ -362,7 +362,7 @@ export default function VaccinationForm({
       />
 
       <VaccineRow
-        label="日本脳炎"
+        label="日本脳炎_最後に接種したもののみ記入"
         typeValue={form.niti.type}
         countValue={form.niti.count}
         dateValue={form.niti.date}
