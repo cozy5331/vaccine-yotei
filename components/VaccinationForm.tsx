@@ -270,60 +270,64 @@ export default function VaccinationForm({
         onDateChange={(v) => updateEntry("go", "date", v)}
       />
 
-      <div className="rounded-2xl border p-4 space-y-3">
-        <div className="font-semibold">B型肝炎</div>
-        <div className="grid gap-3 md:grid-cols-4">
-          <label className="space-y-1">
-            <div className="text-sm text-gray-600">種類</div>
-            <select
-              className="w-full rounded-lg border px-3 py-2"
-              value={form.hb.type}
-              onChange={(e) => updateHb("type", e.target.value)}
-            >
-              {hbTypeOptions.map((opt) => (
-                <option key={opt} value={opt}>
-                  {opt}
-                </option>
-              ))}
-            </select>
-          </label>
+<div className="rounded-2xl border p-4 space-y-3">
+  <div className="font-semibold">B型肝炎_最後に接種したもののみ記入</div>
+  <div className="grid gap-3 md:grid-cols-4">
+    <label className="space-y-1">
+      <div className="text-sm text-gray-600">種類</div>
+      <select
+        className="w-full rounded-lg border px-3 py-2"
+        value={form.hb.type}
+        onChange={(e) => updateHb("type", e.target.value)}
+      >
+        {hbTypeOptions.map((opt) => (
+          <option key={opt} value={opt}>
+            {opt}
+          </option>
+        ))}
+      </select>
+    </label>
 
-          <label className="space-y-1">
-            <div className="text-sm text-gray-600">最終回数</div>
-            <select
-              className="w-full rounded-lg border px-3 py-2"
-              value={form.hb.count}
-              onChange={(e) => updateHb("count", e.target.value)}
-            >
-              {countOptions.map((opt) => (
-                <option key={opt} value={opt}>
-                  {opt}
-                </option>
-              ))}
-            </select>
-          </label>
+    <label className="space-y-1">
+      <div className="text-sm text-gray-600">最終回数</div>
+      <select
+        className="w-full rounded-lg border px-3 py-2"
+        value={form.hb.count}
+        onChange={(e) => updateHb("count", e.target.value)}
+      >
+        {countOptions.map((opt) => (
+          <option key={opt} value={opt}>
+            {opt}
+          </option>
+        ))}
+      </select>
+    </label>
 
-          <label className="space-y-1">
-            <div className="text-sm text-gray-600">最終接種日</div>
-            <input
-              type="date"
-              className="w-full rounded-lg border px-3 py-2"
-              value={form.hb.date}
-              onChange={(e) => updateHb("date", e.target.value)}
-            />
-          </label>
+    <label className="space-y-1">
+      <div className="text-sm text-gray-600">最終接種日</div>
+      <input
+        type="date"
+        className="w-full rounded-lg border px-3 py-2"
+        value={form.hb.date}
+        onChange={(e) => updateHb("date", e.target.value)}
+      />
+    </label>
 
-          <label className="space-y-1">
-            <div className="text-sm text-gray-600">1回目接種日</div>
-            <input
-              type="date"
-              className="w-full rounded-lg border px-3 py-2"
-              value={form.hb.firstDate}
-              onChange={(e) => updateHb("firstDate", e.target.value)}
-            />
-          </label>
-        </div>
-      </div>
+    <label className="space-y-1">
+      <div className="text-sm text-gray-600">1回目接種日</div>
+      <input
+        type="date"
+        className="w-full rounded-lg border px-3 py-2"
+        value={form.hb.firstDate}
+        onChange={(e) => updateHb("firstDate", e.target.value)}
+      />
+    </label>
+  </div>
+
+  <div className="text-xs text-gray-500">
+    最終回数が1回目の場合は、最終接種日と1回目接種日は同じ値を入力して下さい。
+  </div>
+</div>
 
       <VaccineRow
         label="MR_最後に接種したもののみ記入"
