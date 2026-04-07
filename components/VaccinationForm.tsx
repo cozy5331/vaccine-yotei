@@ -324,7 +324,7 @@ export default function VaccinationForm({
     </label>
   </div>
 
-  <div className="text-xs text-gray-500">
+  <div className="text-xs text-gray-500 text-right">
     最終回数が1回目の場合は、最終接種日と1回目接種日は同じ値を入力して下さい。
   </div>
 </div>
