@@ -138,6 +138,11 @@ export default async function ResultPage({ searchParams }: ResultPageProps) {
               <div className="font-medium">{validationStatus || "未取得"}</div>
             </div>
           </div>
+         <div className="mt-4 rounded-xl bg-gray-50 px-4 py-3">
+           <p className="text-xs leading-5 text-gray-500">
+           ※ 判定状態と妥当性チェックは内部確認用です。予定表が表示されていれば接種計画の目安としてご利用いただけますが、反映タイミングや機械的な確認条件により「処理中」や「NG」と表示されることがあります。
+           </p>
+</div>
         </ResultSection>
 
         {data?.status !== "ok" && (
