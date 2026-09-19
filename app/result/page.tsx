@@ -53,7 +53,7 @@ export default async function ResultPage({ searchParams }: ResultPageProps) {
           <h1 className="text-2xl font-bold">予防接種予定表</h1>
           <div className="rounded-2xl border border-red-300 bg-red-50 p-5 text-red-700">
             request_id がありません。<br />
-            Stripe 決済後に戻ってきたURLに request_id が付いていない可能性があります。
+            戻ってきたURLに request_id が付いていない可能性があります。
           </div>
           <a
             href="/form"

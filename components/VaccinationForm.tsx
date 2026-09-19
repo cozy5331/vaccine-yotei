@@ -162,19 +162,19 @@ export default function VaccinationForm({
 
       setRequestId(data.request_id);
 
-      const checkoutRes = await fetch("/api/create-checkout-session", {
+      const skipRes = await fetch("/api/skip-payment", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ request_id: data.request_id }),
       });
 
-      const checkoutData = await checkoutRes.json();
+      const skipData = await skipRes.json();
 
-      if (!checkoutRes.ok || checkoutData.status !== "ok") {
-        throw new Error(checkoutData.message || "決済画面の作成に失敗しました。");
+      if (!skipRes.ok || skipData.status !== "ok") {
+        throw new Error(skipData.message || "予定表の作成に失敗しました。");
       }
 
-      window.location.href = checkoutData.checkout_url;
+      window.location.href = `/result?request_id=${encodeURIComponent(data.request_id)}`;
     } catch (err) {
       setError(err instanceof Error ? err.message : "エラーが発生しました。");
     } finally {
@@ -394,7 +394,7 @@ export default function VaccinationForm({
         disabled={loading}
         className="rounded-2xl px-6 py-3 font-semibold border shadow-sm disabled:opacity-50"
       >
-        {loading ? "処理中..." : "100円で予定表を作成する"}
+        {loading ? "処理中..." : "予定表を作成する"}
       </button>
     </form>
   );
